@@ -95,14 +95,6 @@ class Debug:
             print(f"dbg {dbg_id}: {msg}")
 
 
-def check_feasibility(b, d, x, C, P):
-    for i in C.keys():
-        if not d[i] - sum(x[i, j] for j in C[i]) > 1e-7:
-            raise Exception(f"Parent {i} has a shortage")
-    for j in P.keys():
-        if b[j] - sum(x[i, j] for i in P[j]) > 1e-7:
-            print(j, b[j] - sum(x[i, j] for i in P[j]))
-            raise Exception(f"Child {j} has a shortage")
 
 
 def read_network(fname):

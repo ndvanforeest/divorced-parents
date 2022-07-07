@@ -6,19 +6,19 @@ import numpy as np
 
 from algorithms import fpa_reference
 
-
-def write_network(b, d, C, network, n_parents, sample):
-    # print(n_parents, sample)
-    M = fpa_reference(b, d, C)
-    fname = f'/home/nicky/tmp/networks/{network}_{n_parents}_{sample}.pkl'
-    with open(fname, 'wb') as fp:
-        pickle.dump(b, fp)
-        pickle.dump(d, fp)
-        pickle.dump(C, fp)
-        pickle.dump(M, fp)
+def check_feasibility(b, d, x, C, P):
+    for i in C.keys():
+        if not d[i] - sum(x[i, j] for j in C[i]) > 1e-7:
+            raise Exception(f"Parent {i} has a shortage")
+    for j in P.keys():
+        if b[j] - sum(x[i, j] for i in P[j]) > 1e-7:
+            print(j, b[j] - sum(x[i, j] for i in P[j]))
+            raise Exception(f"Child {j} has a shortage")
 
 
 def make_star(n_parents, sample):
+    # We set the seeds to ensure that random variables are the same
+    # when regenerating the networks
     random.seed(sample)
     np.random.seed(sample)
     n_children = n_parents - 1
@@ -62,6 +62,19 @@ def make_random(n_parents, sample):
     b = np.ones(n_children)
     d = np.random.uniform(1.1, 5, size=len(C))
     write_network(b, d, C, "random", n_parents, sample)
+
+
+
+def write_network(b, d, C, network, n_parents, sample):
+    # print(n_parents, sample)
+    M = fpa_reference(b, d, C)
+    fname = f'/home/nicky/tmp/networks/{network}_{n_parents}_{sample}.pkl'
+    with open(fname, 'wb') as fp:
+        pickle.dump(b, fp)
+        pickle.dump(d, fp)
+        pickle.dump(C, fp)
+        pickle.dump(M, fp)
+
 
 
 def generate_small_networks():

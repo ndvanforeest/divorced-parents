@@ -2,7 +2,6 @@ from itertools import combinations
 from collections import defaultdict
 import random  #
 import numpy as np
-from icecream import ic
 from pytictoc import TicToc
 from priority_queue import priority_dict
 
@@ -12,6 +11,28 @@ from common_functions import En
 t = TicToc()
 thres = 1e-5
 random.seed(3)
+
+
+def check_max_flow(fname):
+    import networkx as nx
+
+    b, d, C, M = common.read_network(fname)
+    P = common.make_parents_dict(C)
+    G = nx.DiGraph()
+    for i in C.keys():
+        G.add_edge("S", i, capacity=d[i])
+    n_parents = len(C)
+    for j in P.keys():
+        G.add_edge(n_parents + j, "T", capacity=b[j])
+    for i in C.keys():
+        for j in C[i]:
+            G.add_edge(i, n_parents + j)
+    flow_value, flow_dict = nx.maximum_flow(G, "S", "T")
+    shortage = b.sum() - flow_value
+    if shortage > 1e-7:
+        print("Network with shortage")
+    else:
+        print("Network does not have a shortage")
 
 
 def fpa_reference(b, d, C):  # fixed point approach
@@ -241,6 +262,8 @@ def time_it(func, fname):
 def main():
     fname = "/home/nicky/tmp/networks/linear_10_0.pkl"
     fname = "/home/nicky/tmp/networks/star_50_0.pkl"
+
+    # check_max_flow(fname)
 
     # time_it(fpa, fname)
     # time_it(wave, fname)
